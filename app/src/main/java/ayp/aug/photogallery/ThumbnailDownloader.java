@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
     private ThumbnailDownloaderListener<T> mThumbnailDownloaderListener;
 
     interface ThumbnailDownloaderListener<T> {
-        void onThumbnailDownloaded(T target, Bitmap thumbnail);
+        void onThumbnailDownloaded(T target, Bitmap thumbnail, String url);
     }
 
     public void setThumbnailDownloaderListener(ThumbnailDownloaderListener<T> thumbnailDownloaderListener) {
@@ -81,7 +82,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
 
                     // url is ok (the same one)
                     mRequestUrlMap.remove(target);
-                    mThumbnailDownloaderListener.onThumbnailDownloaded(target, bitmap);
+                    mThumbnailDownloaderListener.onThumbnailDownloaded(target, bitmap, url);
                 }
             });
 

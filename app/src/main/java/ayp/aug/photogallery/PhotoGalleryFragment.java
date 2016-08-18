@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.util.LruCache;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -49,12 +50,28 @@ public class PhotoGalleryFragment extends Fragment {
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloaderThread;
     private FetcherTask mFetcherTask;
 
+    // Cache
+    private LruCache<String, Bitmap> mMemoryCache;
+    // Memory
+    final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+    // Use 1/8th of the available memory for this memory cache.
+    final int cacheSize = maxMemory / 8;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
+
+        Log.d(TAG, "Memory size = " + maxMemory + " K ");
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
 
         // Move from onCreateView;
         mFlickrFetcher = new FlickrFetcher();
@@ -65,7 +82,11 @@ public class PhotoGalleryFragment extends Fragment {
         ThumbnailDownloader.ThumbnailDownloaderListener<PhotoHolder> listener =
                 new ThumbnailDownloader.ThumbnailDownloaderListener<PhotoHolder>() {
             @Override
-            public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail) {
+            public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail, String url) {
+                if(null == mMemoryCache.get(url)) {
+                    mMemoryCache.put(url, thumbnail);
+                }
+
                 Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
                 target.bindDrawable(drawable);
             }
@@ -176,8 +197,13 @@ public class PhotoGalleryFragment extends Fragment {
 
             holder.bindDrawable(smileyDrawable);
 
-            //
-            mThumbnailDownloaderThread.queueThumbnailDownload(holder, galleryItem.getUrl());
+            if(mMemoryCache.get(galleryItem.getUrl()) != null) {
+                Bitmap bitmap = mMemoryCache.get(galleryItem.getUrl());
+                holder.bindDrawable(new BitmapDrawable(getResources(), bitmap));
+            } else {
+                //
+                mThumbnailDownloaderThread.queueThumbnailDownload(holder, galleryItem.getUrl());
+            }
         }
 
         @Override
