@@ -2,5 +2,5 @@
     <string name="app_name">PhotoGallery</string>
     <string name="photo_loaded">All the Flickr\'s photos is loaded</string>
     <string name="reload">Reload</string>
-    <string name="photo_progress_loaded">Item loaded %d percents</string>
+    <string name="photo_progress_loaded">Item loaded</string>
 </resources>
