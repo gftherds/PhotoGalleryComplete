@@ -3,4 +3,6 @@
     <string name="photo_loaded">All the Flickr\'s photos is loaded</string>
     <string name="reload">Reload</string>
     <string name="photo_progress_loaded">Item loaded</string>
+    <string name="search">Search</string>
+    <string name="clear_search">Clear Search</string>
 </resources>

@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -16,6 +15,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,10 +45,10 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     private RecyclerView mRecyclerView;
-    private FlickrFetcher mFlickrFetcher;
     private List<GalleryItem> mItems;
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloaderThread;
     private FetcherTask mFetcherTask;
+    private String mSearchKey;
 
     // Cache
     private LruCache<String, Bitmap> mMemoryCache;
@@ -74,9 +74,6 @@ public class PhotoGalleryFragment extends Fragment {
         };
 
         // Move from onCreateView;
-        mFlickrFetcher = new FlickrFetcher();
-        mFetcherTask = new FetcherTask();
-
         Handler responseUIHandler = new Handler();
 
         ThumbnailDownloader.ThumbnailDownloaderListener<PhotoHolder> listener =
@@ -116,19 +113,66 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        PhotoGalleryPreference.setStoredSearchKey(getActivity(), mSearchKey);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String searchKey = PhotoGalleryPreference.getStoredSearchKey(getActivity());
+
+        if(searchKey != null) {
+            mSearchKey = searchKey;
+        }
+
+        Log.d(TAG, "On resume completed");
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.mnu_search);
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Query text submitted: " + query);
+                mSearchKey = query;
+                loadPhotos();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "Query text changing: " + newText);
+                return false;
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchView.setQuery(mSearchKey, false);
+            }
+        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mnu_reload:
-                if(!mFetcherTask.isRunning()) {
-                    mFetcherTask.execute();
-                }
+                loadPhotos();
+                return true;
+            case R.id.mnu_clear_search:
+                mSearchKey = null;
+                loadPhotos();
                 return true;
         }
 
@@ -148,12 +192,24 @@ public class PhotoGalleryFragment extends Fragment {
         mItems = new ArrayList<>();
         mRecyclerView.setAdapter(new PhotoGalleryAdapter(mItems));
 
-        if(!mFetcherTask.isRunning()) {
-            mFetcherTask = new FetcherTask();
-            mFetcherTask.execute();
-        }
+        mSearchKey = PhotoGalleryPreference.getStoredSearchKey(getActivity());
+        loadPhotos();
 
+        Log.d(TAG, "On create completed - Loaded search key = " + mSearchKey);
         return v;
+    }
+
+    private void loadPhotos() {
+
+        if(mFetcherTask == null || !mFetcherTask.isRunning()) {
+            mFetcherTask = new FetcherTask();
+
+            if(mSearchKey != null) {
+                mFetcherTask.execute(mSearchKey);
+            } else {
+                mFetcherTask.execute(); // TODO
+            }
+        }
     }
 
     class PhotoHolder extends RecyclerView.ViewHolder {
@@ -212,24 +268,27 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
-    class FetcherTask extends AsyncTask<Void, Integer, List<GalleryItem>> implements FlickrFetcher.CallBack {
-
-        int total;
+    class FetcherTask extends AsyncTask<String, Void, List<GalleryItem>> {
 
         boolean running = false;
 
         @Override
-        protected List<GalleryItem> doInBackground(Void... voids) {
-
+        protected List<GalleryItem> doInBackground(String ... params) {
             synchronized (this) {
                 running = true;
             }
 
             try {
                 Log.d(TAG, "Start fetcher task");
-                List<GalleryItem> itemList = new ArrayList<>();
 
-                mFlickrFetcher.fetchItems(itemList, this);
+                List<GalleryItem> itemList = new ArrayList<>();
+                FlickrFetcher flickrFetcher = new FlickrFetcher();
+                if(params.length > 0) {
+                    flickrFetcher.searchPhotos(itemList, params[0]);
+                } else {
+                    flickrFetcher.getRecentPhotos(itemList);
+                }
+
                 Log.d(TAG, "Fetcher task finished");
                 return itemList;
             } finally {
@@ -245,30 +304,12 @@ public class PhotoGalleryFragment extends Fragment {
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            String formatString = getResources().getString(R.string.photo_progress_loaded);
-            Snackbar.make(mRecyclerView, formatString, Snackbar.LENGTH_SHORT).show();
-        }
-
-        @Override
         protected void onPostExecute(List<GalleryItem> galleryItems) {
             mItems = galleryItems;
             mRecyclerView.setAdapter(new PhotoGalleryAdapter(mItems));
-        }
 
-        ////////////////////////
-
-        @Override
-        public void fetchItem(int itemCount) {
-            float result = (float) itemCount / total * 100;
-            publishProgress( Math.round(result) );
-        }
-
-        @Override
-        public void totalLen(int len) {
-            total = len;
+            String formatString = getResources().getString(R.string.photo_progress_loaded);
+            Snackbar.make(mRecyclerView, formatString, Snackbar.LENGTH_SHORT).show();
         }
     }
 }
