@@ -94,6 +94,12 @@ public class FlickrFetcher {
         return jsonString;
     }
 
+    /**
+     * Search photo then put into <b>items</b>
+     *
+     * @param items array target
+     * @param key to search
+     */
     public void searchPhotos(List<GalleryItem> items, String key) {
         try {
             String url = buildUrl(METHOD_SEARCH, key);
