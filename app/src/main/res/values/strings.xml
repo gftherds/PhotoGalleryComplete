@@ -5,4 +5,9 @@
     <string name="photo_progress_loaded">Item loaded</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
+    <string name="start_polling">Start polling</string>
+    <string name="stop_polling">Stop polling</string>
+    <string name="new_picture_arriving">New photo here</string>
+    <string name="new_picture_title">New picture is here</string>
+    <string name="new_picture_content">New pictures for your app has been arriving</string>
 </resources>

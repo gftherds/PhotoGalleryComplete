@@ -86,7 +86,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
                 }
             });
 
-            Log.i(TAG, "Bitmap URL downloaded: ");
+            Log.i(TAG, "| Bitmap URL downloaded.");
         } catch (IOException ioe) {
             Log.e(TAG, "Error downloading:", ioe);
         }

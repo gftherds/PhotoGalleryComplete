@@ -1,5 +1,6 @@
 package ayp.aug.photogallery;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -139,7 +140,7 @@ public class PhotoGalleryFragment extends Fragment {
 
         MenuItem menuItem = menu.findItem(R.id.mnu_search);
         final SearchView searchView = (SearchView) menuItem.getActionView();
-
+        searchView.setQuery(mSearchKey, false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -162,6 +163,14 @@ public class PhotoGalleryFragment extends Fragment {
                 searchView.setQuery(mSearchKey, false);
             }
         });
+
+        // render polling
+        MenuItem mnuPolling = menu.findItem(R.id.mnu_toggle_polling);
+        if(PollService.isServiceAlarmOn(getActivity())) {
+            mnuPolling.setTitle(R.string.stop_polling);
+        } else {
+            mnuPolling.setTitle(R.string.start_polling);
+        }
     }
 
     @Override
@@ -170,6 +179,14 @@ public class PhotoGalleryFragment extends Fragment {
             case R.id.mnu_reload:
                 loadPhotos();
                 return true;
+
+            case R.id.mnu_toggle_polling:
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                Log.d(TAG, ((shouldStartAlarm) ? "Start" : "Stop") + " Intent service" );
+                PollService.setServiceAlarm(getActivity(), shouldStartAlarm);
+                getActivity().invalidateOptionsMenu(); // refresh menu
+                return true;
+
             case R.id.mnu_clear_search:
                 mSearchKey = null;
                 loadPhotos();
