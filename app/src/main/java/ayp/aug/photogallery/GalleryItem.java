@@ -9,6 +9,7 @@ public class GalleryItem {
     private String mId;
     private String mTitle;
     private String mUrl;
+    private String mBigSizeUrl;
 
     public void setId(String id) {
         mId = id;
@@ -52,5 +53,14 @@ public class GalleryItem {
         }
 
         return false;
+    }
+
+    public void setBigSizeUrl(String bigSizeUrl) {
+        mBigSizeUrl
+                = bigSizeUrl;
+    }
+
+    public String getBigSizeUrl() {
+        return mBigSizeUrl;
     }
 }
