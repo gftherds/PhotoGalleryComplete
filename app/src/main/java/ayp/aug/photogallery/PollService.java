@@ -5,10 +5,12 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -27,7 +29,7 @@ public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
 
-    private static final int POLL_INTERVAL = 1000 * 60; // 60 secs
+    private static final int POLL_INTERVAL = 1000 * 1; // 15 mins
 
     public static Intent newIntent(Context context) {
         return new Intent(context, PollService.class);
@@ -39,17 +41,20 @@ public class PollService extends IntentService {
 
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
-        if(isOn) {
+        if (isOn) {
             //AlarmManager.RTC ->>> System.currentTimeMillis();
-            am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,               // param 1: Mode
+            am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,               // param 1: Mode
                     SystemClock.elapsedRealtime(),                                 // param 2: Start
                     POLL_INTERVAL,                                              // param 3: Interval
                     pi);                                                        // param 4: Pending action(intent)
+
+            Log.d(TAG, "Run by Alarm Manager");
 
         } else {
             am.cancel(pi);      // Cancel interval call
             pi.cancel();        // Cancel Pending intent call
         }
+
     }
 
     public static boolean isServiceAlarmOn(Context ctx) {
@@ -71,7 +76,7 @@ public class PollService extends IntentService {
         }
 
         Log.i(TAG, "Active network!!");
-        
+
         String query = PhotoGalleryPreference.getStoredSearchKey(this);
         String storedLastId = PhotoGalleryPreference.getStoredLastId(this);
 
@@ -115,6 +120,8 @@ public class PollService extends IntentService {
             //  Get notification manager from context
             NotificationManagerCompat nm = NotificationManagerCompat.from(this);
             nm.notify(0, notification);  // call notification
+
+            new Screen().on(this);
         }
 
         PhotoGalleryPreference.setStoredLastId(this, newestId);
@@ -149,4 +156,5 @@ public class PollService extends IntentService {
 
         return isActiveNetworkConnected;
     }
+
 }
