@@ -11,4 +11,5 @@
     <string name="new_picture_title">New picture is here</string>
     <string name="new_picture_content">New pictures for your app has been arriving</string>
     <string name="no_photo_url">Not able to read URL</string>
+    <string name="manual_check">Manual Check</string>
 </resources>

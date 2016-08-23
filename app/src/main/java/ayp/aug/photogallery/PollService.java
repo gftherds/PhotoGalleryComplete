@@ -69,6 +69,7 @@ public class PollService extends IntentService {
 
         Log.i(TAG, "Active network!!");
 
+
         String query = PhotoGalleryPreference.getStoredSearchKey(this);
         String storedLastId = PhotoGalleryPreference.getStoredLastId(this);
 

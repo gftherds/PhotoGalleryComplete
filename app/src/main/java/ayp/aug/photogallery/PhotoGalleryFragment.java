@@ -194,6 +194,12 @@ public class PhotoGalleryFragment extends Fragment {
                 mSearchKey = null;
                 loadPhotos();
                 return true;
+
+            case R.id.mnu_manual_check:
+                Intent pollIntent = PollService.newIntent(getActivity());
+                getActivity().startService(pollIntent);
+                return true;
+
         }
 
         return super.onOptionsItemSelected(item);
