@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -40,9 +41,10 @@ public class PollService extends IntentService {
         if(isOn) {
             //AlarmManager.RTC ->>> System.currentTimeMillis();
             am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,               // param 1: Mode
-                    SystemClock.elapsedRealtime(),                              // param 2: Start
+                    SystemClock.elapsedRealtime(),                                 // param 2: Start
                     POLL_INTERVAL,                                              // param 3: Interval
                     pi);                                                        // param 4: Pending action(intent)
+
         } else {
             am.cancel(pi);      // Cancel interval call
             pi.cancel();        // Cancel Pending intent call
@@ -116,6 +118,27 @@ public class PollService extends IntentService {
         }
 
         PhotoGalleryPreference.setStoredLastId(this, newestId);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "Service create.");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "Service start command. flags=" + flags + ", startId=" + startId);
+        int result = super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "Service start result = " + result);
+
+        return result;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "Service destroy.");
     }
 
     private boolean isNetworkAvailableAndConnected() {
