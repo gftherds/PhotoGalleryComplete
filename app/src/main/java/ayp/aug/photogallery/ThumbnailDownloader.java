@@ -19,7 +19,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
 
     private static final String TAG = "ThumbnailDownloader";
 
-    private static final int DOWNLOAD_FILE = 2018;
+    private static final int DOWNLOAD_FILE = 512;
 
     private Handler mRequestHandler;
     private final ConcurrentMap<T, String> mRequestUrlMap = new ConcurrentHashMap<>();
@@ -47,13 +47,16 @@ public class ThumbnailDownloader<T> extends HandlerThread {
             @Override
             public void handleMessage(Message msg) {
                 // Work in the queue
-                if(msg.what == DOWNLOAD_FILE) {
-                    T target = (T) msg.obj;
+                switch (msg.what) {
+                    case DOWNLOAD_FILE:
+                        T target = (T) msg.obj;
 
-                    String url = mRequestUrlMap.get(target);
-                    Log.i(TAG, "Got message from queue: pls download this URL: " + url);
+                        String url = mRequestUrlMap.get(target);
+                        Log.i(TAG, "Got message from queue: pls download this URL: " + url);
 
-                    handleRequestDownload(target, url);
+                        handleRequestDownload(target, url);
+                        break;
+                    default:
                 }
             }
         };

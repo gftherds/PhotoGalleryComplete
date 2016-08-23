@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationManagerCompat;
@@ -70,8 +71,7 @@ public class PollService extends IntentService {
         }
 
         Log.i(TAG, "Active network!!");
-
-
+        
         String query = PhotoGalleryPreference.getStoredSearchKey(this);
         String storedLastId = PhotoGalleryPreference.getStoredLastId(this);
 
