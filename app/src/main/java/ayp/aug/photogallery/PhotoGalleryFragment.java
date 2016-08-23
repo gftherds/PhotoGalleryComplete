@@ -1,6 +1,6 @@
 package ayp.aug.photogallery;
 
-import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,11 +12,9 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.LruCache;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -242,7 +240,7 @@ public class PhotoGalleryFragment extends Fragment {
         public PhotoHolder(View itemView) {
             super(itemView);
 
-            mPhoto = (ImageView) itemView.findViewById(R.id.image_photo);
+            mPhoto = (ImageView) itemView.findViewById(R.id.image_photo_viewer);
             mPhoto.setOnClickListener(this);
         }
 
@@ -256,30 +254,12 @@ public class PhotoGalleryFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Snackbar.make(mRecyclerView, "Clicked on Photo", Snackbar.LENGTH_SHORT).show();
-
-            // Execute Async Task
-            new AsyncTask<String, Void, Bitmap>() {
-                @Override
-                protected Bitmap doInBackground(String... urls) {
-                    FlickrFetcher flickrFetcher = new FlickrFetcher();
-                    Bitmap bm = null;
-                    try {
-                        byte[] bytes = flickrFetcher.getUrlBytes(urls[0]);
-                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    } catch (IOException ioe) {
-                        Log.e(TAG, "error in reading Bitmap", ioe);
-                        return null;
-                    }
-                    return bm;
-                }
-
-                @Override
-                protected void onPostExecute(Bitmap bitmap) {
-                    ImageViewDialog dialogFragment = ImageViewDialog.getInstance(bitmap);
-                    dialogFragment.show(getFragmentManager(), DIALOG_SHOW_BIG_IMAGE);
-                }
-            }.execute(mBigUrl);
+            if(mBigUrl != null) {
+                Intent intent = ImageViewActivity.newIntent(getActivity(), mBigUrl);
+                startActivity(intent);
+            } else {
+                Snackbar.make(view, R.string.no_photo_url, Snackbar.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -370,31 +350,4 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
-    public static class ImageViewDialog extends DialogFragment {
-
-        private final static String ARG_BITMAP = "ARG_BMP";
-        public static ImageViewDialog getInstance(Bitmap bitmap) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(ARG_BITMAP, bitmap);
-            ImageViewDialog dialogFragment = new ImageViewDialog();
-            dialogFragment.setArguments(bundle);
-            return dialogFragment;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Bitmap bmp = getArguments().getParcelable(ARG_BITMAP);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-            ImageView imgView = new ImageView(getActivity());
-            imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imgView.setImageDrawable(new BitmapDrawable(getResources(), bmp));
-
-            builder.setView(imgView);
-            builder.setPositiveButton(android.R.string.ok, null);
-            return builder.create();
-        }
-    }
 }

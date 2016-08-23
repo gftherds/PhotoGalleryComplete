@@ -5,6 +5,6 @@
         android:layout_height="120dp"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
-        android:id="@+id/image_photo">
+        android:id="@+id/image_photo_viewer">
 
 </ImageView>
