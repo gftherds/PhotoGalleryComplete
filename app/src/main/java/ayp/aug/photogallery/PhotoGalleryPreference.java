@@ -10,11 +10,20 @@ import android.preference.PreferenceManager;
 public class PhotoGalleryPreference {
     private static final String TAG = "PhotoGalleryPref";
 
-    protected static final String PREF_SEARCH_KEY = "PhotoGalleryPref";
-    protected static final String PREF_LAST_ID = "PREF_LAST_ID";
+    private static final String PREF_SEARCH_KEY = "PhotoGalleryPref";
+    private static final String PREF_LAST_ID = "PREF_LAST_ID";
+    private static final String PREF_IS_ALARM_ON = "PREF_ALARM_ON";
 
     public static SharedPreferences mySharedPref(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public static Boolean getStoredIsAlarmOn(Context ctx) {
+        return mySharedPref(ctx).getBoolean(PREF_IS_ALARM_ON, false);
+    }
+
+    public static void setStoredIsAlarmOn(Context context, Boolean isAlarmOn) {
+        mySharedPref(context).edit().putBoolean(PREF_IS_ALARM_ON, isAlarmOn).apply();
     }
 
     public static String getStoredSearchKey(Context context) {

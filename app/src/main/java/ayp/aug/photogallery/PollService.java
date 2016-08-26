@@ -29,7 +29,7 @@ public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
 
-    private static final int POLL_INTERVAL = 1000 * 1; // 15 mins
+    private static final int POLL_INTERVAL = 1000 * 60 * 1; // 15 mins
 
     public static Intent newIntent(Context context) {
         return new Intent(context, PollService.class);
@@ -55,6 +55,7 @@ public class PollService extends IntentService {
             pi.cancel();        // Cancel Pending intent call
         }
 
+        PhotoGalleryPreference.setStoredIsAlarmOn(c, isOn);
     }
 
     public static boolean isServiceAlarmOn(Context ctx) {
