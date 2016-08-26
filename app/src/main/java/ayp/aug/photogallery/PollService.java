@@ -1,5 +1,6 @@
 package ayp.aug.photogallery;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -29,7 +30,14 @@ public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
 
-    private static final int POLL_INTERVAL = 1000 * 60 * 1; // 15 mins
+    private static final int POLL_INTERVAL = 1000 * 60; // 1 min
+
+    // public broadcast name for this action
+    public static final String ACTION_SHOW_NOTIFICATION = "ayp.aug.photogallery.ACTION_SHOW_NOTIFICATION";
+
+    public static final String PERMISSION_SHOW_NOTIF = "ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION";
+    public static final String REQUEST_CODE = "REQUEST_CODE_INTENT";
+    public static final String NOTIFICATION = "NOTIFICATION_OBJ";
 
     public static Intent newIntent(Context context) {
         return new Intent(context, PollService.class);
@@ -118,14 +126,21 @@ public class PollService extends IntentService {
 
             Notification notification = notiBuilder.build();  // << Build notification from builder
 
-            //  Get notification manager from context
-            NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-            nm.notify(0, notification);  // call notification
-
-            new Screen().on(this);
+            sendBackgroundNotification(0, notification);
         }
 
         PhotoGalleryPreference.setStoredLastId(this, newestId);
+    }
+
+    private void sendBackgroundNotification(int requestCode, Notification notification) {
+        Intent intent = new Intent(ACTION_SHOW_NOTIFICATION);
+        intent.putExtra(REQUEST_CODE, requestCode);
+        intent.putExtra(NOTIFICATION, notification);
+
+        sendOrderedBroadcast(intent, PERMISSION_SHOW_NOTIF,
+                null, null,
+                Activity.RESULT_OK,
+                null, null);
     }
 
     @Override

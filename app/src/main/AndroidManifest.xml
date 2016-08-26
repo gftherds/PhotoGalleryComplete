@@ -2,10 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ayp.aug.photogallery">
 
+    <permission
+        android:name="ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION"
+        android:protectionLevel="signature"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION"/>
 
     <application
         android:allowBackup="true"
@@ -38,12 +43,19 @@
             android:name=".PollStarterReceiver"
             android:enabled="true"
             android:exported="true">
-
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".NotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
 
+            <intent-filter android:priority="-999">
+                <action android:name="ayp.aug.photogallery.ACTION_SHOW_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
