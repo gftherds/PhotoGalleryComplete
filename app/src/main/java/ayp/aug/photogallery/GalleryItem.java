@@ -1,5 +1,7 @@
 package ayp.aug.photogallery;
 
+import android.net.Uri;
+
 import java.lang.reflect.GenericArrayType;
 
 /**
@@ -10,6 +12,7 @@ public class GalleryItem {
     private String mTitle;
     private String mUrl;
     private String mBigSizeUrl;
+    private String mOwner;
 
     public void setId(String id) {
         mId = id;
@@ -62,5 +65,22 @@ public class GalleryItem {
 
     public String getBigSizeUrl() {
         return mBigSizeUrl;
+    }
+
+    public void setOwner(String owner) {
+        mOwner = owner;
+    }
+
+    public String getOwner() {
+        return mOwner;
+    }
+
+    private static final String PHOTO_URL_PREFIX = "https://www.flickr.com/photos/";
+
+    public Uri getPhotoUri() {
+        return Uri.parse(PHOTO_URL_PREFIX).buildUpon() // Return builder
+                .appendPath(mOwner)
+                .appendPath(mId)
+                .build(); // Return Uri
     }
 }

@@ -53,7 +53,7 @@ public class ImageViewFragment extends Fragment {
         View v = LayoutInflater.from(getActivity()).inflate(
                 R.layout.fragment_image_view, container, false);
 
-        mPhotoViewer = (ImageView) v.findViewById(R.id.image_photo_viewer);
+        mPhotoViewer = (ImageView) v.findViewById(R.id.view_image_photo_viewer);
 
         if(mUrl != null) {
             new LoadPhotoViewer().execute(mUrl);

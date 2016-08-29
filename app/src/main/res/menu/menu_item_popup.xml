@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="@string/open_by_url"
+    <item android:title="@string/open_with_external_browser"
           android:id="@+id/mnu_open_url"
           app:showAsAction="never"
         />

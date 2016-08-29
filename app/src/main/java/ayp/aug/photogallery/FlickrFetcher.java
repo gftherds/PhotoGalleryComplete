@@ -144,6 +144,7 @@ public class FlickrFetcher {
 
             item.setId(jsonPhotoItem.getString("id"));
             item.setTitle(jsonPhotoItem.getString("title"));
+            item.setOwner(jsonPhotoItem.getString("owner"));
 
             if(!jsonPhotoItem.has("url_s")) {
                 continue;
