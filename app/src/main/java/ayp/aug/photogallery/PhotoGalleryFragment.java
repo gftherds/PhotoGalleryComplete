@@ -15,9 +15,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -235,7 +238,10 @@ public class PhotoGalleryFragment extends VisibleFragment {
         }
     }
 
-    class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class PhotoHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener,
+            View.OnCreateContextMenuListener,
+            MenuItem.OnMenuItemClickListener {
 
         ImageView mPhoto;
         String mBigUrl;
@@ -245,6 +251,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
 
             mPhoto = (ImageView) itemView.findViewById(R.id.image_photo_viewer);
             mPhoto.setOnClickListener(this);
+
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         public void bindDrawable(@NonNull Drawable drawable) {
@@ -263,6 +271,19 @@ public class PhotoGalleryFragment extends VisibleFragment {
             } else {
                 Snackbar.make(view, R.string.no_photo_url, Snackbar.LENGTH_SHORT).show();
             }
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            MenuItem menuItem = menu.add(R.string.open_by_url);
+            menu.setHeaderTitle(mBigUrl);
+            menuItem.setOnMenuItemClickListener(this);
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Toast.makeText(getActivity(), "Open menu for ... " + mBigUrl, Toast.LENGTH_SHORT).show();
+            return true;
         }
     }
 
