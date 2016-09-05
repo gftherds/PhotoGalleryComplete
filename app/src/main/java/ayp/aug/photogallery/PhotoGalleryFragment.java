@@ -109,6 +109,9 @@ public class PhotoGalleryFragment extends VisibleFragment {
         setHasOptionsMenu(true);
         setRetainInstance(true);
 
+        mUseGPS = PhotoGalleryPreference.getUseGPS(getActivity());
+        mSearchKey = PhotoGalleryPreference.getStoredSearchKey(getActivity());
+
         Log.d(TAG, "Memory size = " + maxMemory + " K ");
 
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -476,7 +479,13 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 List<GalleryItem> itemList = new ArrayList<>();
                 FlickrFetcher flickrFetcher = new FlickrFetcher();
                 if (params.length > 0) {
-                    flickrFetcher.searchPhotos(itemList, params[0]);
+                    if (mUseGPS && mLocation != null){
+                        flickrFetcher.searchPhotos(itemList, params[0],
+                                String.valueOf(mLocation.getLatitude()),
+                                String.valueOf(mLocation.getLongitude()));
+                    }else{
+                        flickrFetcher.searchPhotos(itemList, params[0]);
+                    }
                 } else {
                     flickrFetcher.getRecentPhotos(itemList);
                 }
