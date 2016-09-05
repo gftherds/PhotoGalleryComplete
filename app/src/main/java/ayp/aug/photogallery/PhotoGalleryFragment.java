@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -81,11 +82,12 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 public void onConnected(@Nullable Bundle bundle) {
                     Log.i(TAG, "Google API connected");
                     mUseGPS = PhotoGalleryPreference.getUseGPS(getActivity());
-                    Log.d(TAG, "Use GPS: "+mUseGPS);
+                    Log.d(TAG, "Use GPS: " + mUseGPS);
                     if (mUseGPS) {
                         findLocation();
                     }
                 }
+
                 @Override
                 public void onConnectionSuspended(int i) {
                     Log.i(TAG, "Google API suspended ");
@@ -399,6 +401,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
             menuItem.setOnMenuItemClickListener(this);
             MenuItem menuItem2 = menu.add(0, 2, 0, R.string.open_in_app_browser);
             menuItem2.setOnMenuItemClickListener(this);
+            MenuItem menuItem3 = menu.add(0, 3, 3, R.string.open_in_map);
+            menuItem3.setOnMenuItemClickListener(this);
         }
 
         @Override
@@ -412,6 +416,15 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 case 2:
                     Intent i2 = PhotoPageActivity.newIntent(getActivity(), mGalleryItem.getPhotoUri());
                     startActivity(i2); // call internal activity by explicit intent
+                    return true;
+
+                case 3:
+                    Location itemLoc = new Location("");
+                    itemLoc.setLatitude(Double.valueOf(mGalleryItem.getmLat()));
+                    itemLoc.setLongitude(Double.valueOf(mGalleryItem.getmLong()));
+
+                    Intent i3 = PhotoMapActivity.newIntent(getActivity(),  mLocation, null,null);
+                    startActivity(i3); // call internal activity by explicit intent
                     return true;
 
                 default:
@@ -479,11 +492,11 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 List<GalleryItem> itemList = new ArrayList<>();
                 FlickrFetcher flickrFetcher = new FlickrFetcher();
                 if (params.length > 0) {
-                    if (mUseGPS && mLocation != null){
+                    if (mUseGPS && mLocation != null) {
                         flickrFetcher.searchPhotos(itemList, params[0],
                                 String.valueOf(mLocation.getLatitude()),
                                 String.valueOf(mLocation.getLongitude()));
-                    }else{
+                    } else {
                         flickrFetcher.searchPhotos(itemList, params[0]);
                     }
                 } else {

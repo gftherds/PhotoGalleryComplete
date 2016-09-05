@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ayp.aug.photogallery">
+    package="ayp.aug.photogallery">
 
     <permission
         android:name="ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="ayp.aug.photogallery.RECEIVE_SHOW_NOTIFICATION" />
 
     //When we use at GPS
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    //Use Map
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -22,33 +26,36 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value=" AIzaSyCu4sICNw6HDPF3MDIe_zPMfXsx2J2dux8 " />
         <activity android:name=".PhotoGalleryActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service
             android:name=".PollJobService"
             android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- Poll service -->
-        <service android:name=".PollService"/>
+        <service android:name=".PollService" />
 
         <activity
             android:name=".ImageViewActivity"
-            android:parentActivityName=".PhotoGalleryActivity">
-        </activity>
+            android:parentActivityName=".PhotoGalleryActivity"></activity>
 
         <receiver
             android:name=".PollStarterReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver
@@ -63,15 +70,21 @@
 
         <activity
             android:name=".PhotoPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/in_app_browser"
-            android:parentActivityName=".PhotoGalleryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:parentActivityName=".PhotoGalleryActivity" />
 
         <activity
             android:name=".SettingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/photo_setting"
-            android:parentActivityName=".PhotoGalleryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:parentActivityName=".PhotoGalleryActivity" />
+
+        <activity
+            android:name=".PhotoMapActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/photo_map"
+            android:parentActivityName=".PhotoGalleryActivity" />
     </application>
 
 </manifest>

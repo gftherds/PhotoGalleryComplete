@@ -19,4 +19,6 @@
     <string name="open_in_app_browser">Open in-app browser</string>
     <string name="in_app_browser">In-app Browser</string>
     <string name="photo_setting">Photo Setting</string>
+    <string name="photo_map">Map for photo</string>
+    <string name="open_in_map">Open Google map</string>
 </resources>
