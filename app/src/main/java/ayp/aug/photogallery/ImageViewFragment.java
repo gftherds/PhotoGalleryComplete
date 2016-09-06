@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
 import java.io.IOException;
 
 /**
@@ -56,7 +58,7 @@ public class ImageViewFragment extends Fragment {
         mPhotoViewer = (ImageView) v.findViewById(R.id.view_image_photo_viewer);
 
         if(mUrl != null) {
-            new LoadPhotoViewer().execute(mUrl);
+            Glide.with(getActivity()).load(mUrl).into(mPhotoViewer);
         }
 
         Log.d(TAG, "Finish view :D");

@@ -15,11 +15,11 @@ public class PhotoMapActivity extends SingleFragmentActivity {
     private static final String KEY_GALLERY_ITEM = "GA2";
     private static final String KEY_BITMAP = "GA3";
 
-    protected static Intent newIntent(Context context, Location location, Location galleryItem, Bitmap bitmap) {
+    protected static Intent newIntent(Context context, Location location, Location galleryItem, String url) {
         Intent i = new Intent(context, PhotoMapActivity.class);
         i.putExtra(KEY_LOCATION, location);
         i.putExtra(KEY_GALLERY_ITEM, galleryItem);
-        i.putExtra(KEY_BITMAP, bitmap);
+        i.putExtra(KEY_BITMAP, url);
 
         return i;
     }
@@ -29,8 +29,8 @@ public class PhotoMapActivity extends SingleFragmentActivity {
         if (getIntent() != null) {
             Location galleryLoc = getIntent().getParcelableExtra(KEY_GALLERY_ITEM);
             Location location = getIntent().getParcelableExtra(KEY_LOCATION);
-            Bitmap bitmap = getIntent().getParcelableExtra(KEY_BITMAP);
-            return PhotoMapFragment.newInstance(location, galleryLoc, bitmap);
+            String url = getIntent().getStringExtra(KEY_BITMAP);
+            return PhotoMapFragment.newInstance(location, galleryLoc, url);
         }
         return PhotoMapFragment.newInstance();
     }

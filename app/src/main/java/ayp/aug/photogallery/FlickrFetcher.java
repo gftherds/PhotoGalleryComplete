@@ -66,7 +66,7 @@ public class FlickrFetcher {
         builder.appendQueryParameter("api_key", API_KEY);
         builder.appendQueryParameter("format", "json");
         builder.appendQueryParameter("nojsoncallback", "1");
-        builder.appendQueryParameter("extras", "url_s,url_z");
+        builder.appendQueryParameter("extras", "url_s,url_z,geo");
 
         if (METHOD_SEARCH.equalsIgnoreCase(method)) {
             builder.appendQueryParameter("text", param[0]);
@@ -163,14 +163,19 @@ public class FlickrFetcher {
                 continue;
             }
 
-            item.setUrl(jsonPhotoItem.getString("url_s"));
+
 
             if (!jsonPhotoItem.has("url_z")) {
                 continue;
             }
+            Log.i(TAG, "latitude : " + jsonPhotoItem.getString("latitude"));
+            item.setUrl(jsonPhotoItem.getString("url_s"));
+            item.setmLat(jsonPhotoItem.getString("latitude"));
+            item.setmLong(jsonPhotoItem.getString("longitude"));
+
+
 
             item.setBigSizeUrl(jsonPhotoItem.getString("url_z"));
-
             newGalleryItemList.add(item);
 
         }
